@@ -87,11 +87,13 @@ const U = [[1, 0, 0], [0, 1, 0], [0, 0, 1]].map((v) => { const a = k.iso(v, P); 
 writeFileSync(join(HERE, "leaves.json"), JSON.stringify({ leaves: leaves.map((l, i) => ({ ...l, name: items[i].name, asm: items[i].asm })), asm: asmList.map((a) => ({ id: a.id, step: a.step, move: a.move, slide: a.slide })), U, P }));
 
 // ---- a pin on every part: where it comes from (the top of its biggest piece, or the plug end of a cable) -------
+const PIN_SHIFT = { psu: [-48, -20], ssd: [44, 0] };
 const PIN_ON = { cabsata: "sata plug", cab24: "24-pin plug", cabcpu: "eps plug", cabgpu: "12v-2x6 plug" };
 const pins = ASSEMBLIES.map((a) => {
   const mine = items.filter((it) => it.asm === a.id);
   const pick = PIN_ON[a.id] ? mine.find((it) => it.name === PIN_ON[a.id]) : mine.reduce((best, it) => ((it.max[0] - it.min[0]) * (it.max[1] - it.min[1]) > best.ar ? { it, ar: (it.max[0] - it.min[0]) * (it.max[1] - it.min[1]) } : best), { ar: -1 }).it;
-  const world = [(pick.min[0] + pick.max[0]) / 2, (pick.min[1] + pick.max[1]) / 2, pick.max[2]];
+  const sh = PIN_SHIFT[a.id] || [0, 0];
+  const world = [(pick.min[0] + pick.max[0]) / 2 + sh[0], (pick.min[1] + pick.max[1]) / 2 + sh[1], pick.max[2]];
   const [x, y] = k.iso(world, P);
   return { id: a.id, step: a.step, x: +x.toFixed(1), y: +y.toFixed(1) };
 });
@@ -110,6 +112,7 @@ const svg = k.figureSvg({
 const EXTRA_CSS = `
 .pc-void{fill:var(--anatomy-shade-0);stroke:none}
 .pc-stage{outline:none;position:relative}
+.pc-stage .iso-svg{overflow:hidden}
 .pc-glass{fill:var(--anatomy-hi);opacity:.035;stroke:none;pointer-events:none}
 .pc-sheen{fill:var(--anatomy-hi);opacity:.07;stroke:none;pointer-events:none}
 .pc-stage[data-focus] .it:not([data-on]){--anatomy-hi:var(--anatomy-mid);--anatomy-mid:var(--anatomy-lo)}
@@ -294,6 +297,13 @@ function place() {
     const m = 34, asp = ${WIDTH} / ${HEIGHT};
     const tw = Math.max(bx1 - bx0 + 2 * m, (by1 - by0 + 2 * m) * asp), th = tw / asp;
     view.target = [(bx0 + bx1) / 2 - tw / 2, (by0 + by1) / 2 - th / 2, tw, th];
+    if (opened && Aby[opened].sx > 0.01) {
+      let fx0 = 1e9, fy0 = 1e9, fx1 = -1e9, fy1 = -1e9;
+      for (const i of Aby[opened].leaves) { const s = LEAVES[i].sb, o = off[i]; fx0 = Math.min(fx0, s[0] + o[3]); fy0 = Math.min(fy0, s[1] + o[4]); fx1 = Math.max(fx1, s[2] + o[3]); fy1 = Math.max(fy1, s[3] + o[4]); }
+      const fm = 60, fw = Math.max(fx1 - fx0 + 2 * fm, (fy1 - fy0 + 2 * fm) * asp, 300), fh = fw / asp;
+      const t = Math.min(1, Aby[opened].sx), foc = [(fx0 + fx1) / 2 - fw / 2, (fy0 + fy1) / 2 - fh / 2, fw, fh];
+      view.target = view.target.map((v, q) => v + (foc[q] - v) * t);
+    }
     if (!view.now) { view.now = view.target.slice(); applyView(); }
   }
   const next = sortLeaves(LEAVES, off, V, RANK);

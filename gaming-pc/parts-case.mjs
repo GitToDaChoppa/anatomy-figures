@@ -111,10 +111,10 @@ export function buildCase(W) {
       const label = { x: PSU.x + 52, y: PSU.y + 14, w: 92, d: 50, r: 3 };
       out += S(k.slabOf(label, zt, 0.8, P, 3), { tone: "lo", crease: "none" });
       out += L(k.planOutline(k.insetPlan(label, 2), zt + 0.8, P, 3), { tone: "faint" });
-      out += W.textZ(label.x + 6, label.y + 17, zt + 0.8, "850 W", 12, "mid");
-      out += W.textZ(label.x + 6, label.y + 27, zt + 0.8, "80 PLUS GOLD", 4.4, "lo");
-      out += W.textZ(label.x + 6, label.y + 34, zt + 0.8, "+12V 70.8 A  ATX 3.1", 4.4, "lo");
-      for (const dy of [39, 43.5]) out += L(k.lineOnTop([label.x + 6, label.y + dy], [label.x + 6 + (dy === 39 ? 72 : 52), label.y + dy], zt + 0.8, P), { tone: "lo", free: true });
+      out += W.textZ(label.x + 6, label.y + 16, zt + 0.8, "850 W", 10, "mid");
+      out += W.textZ(label.x + 6, label.y + 25, zt + 0.8, "80 PLUS GOLD", 4.2, "lo");
+      out += W.textZ(label.x + 6, label.y + 31, zt + 0.8, "+12V 70.8 A · ATX 3.1", 4.2, "lo");
+      for (const dy of [37, 41.5]) out += L(k.lineOnTop([label.x + 6, label.y + dy], [label.x + 6 + (dy === 37 ? 72 : 52), label.y + dy], zt + 0.8, P), { tone: "lo", free: true });
       // vent slots at the front end
       const vents = [];
       for (let i = 0; i < 6; i++) vents.push(k.planOutline({ x: PSU.x + 12 + i * 6.4, y: PSU.y + 12, w: 3, d: 54, r: 1.5 }, zt, P, 3));
@@ -164,6 +164,10 @@ export function buildCase(W) {
       for (const [y0, y1, z0, z1] of [[72, 87, 14, 22], [92, 103, 14, 18], [106, 122, 14, 28], [126, 140, 14, 30], [144, 158, 14, 30], [162, 176, 14, 30], [180, 194, 14, 30], [198, 224, 14, 24]]) {
         const d = ioWin(y0, y1, z0, z1);
         out += `<path class="pc-void" d="${d}"/>` + L(d, { tone: "lo" });
+        const w = y1 - y0, h = z1 - z0;
+        if (w > 20) out += dots([0, 1, 2].map((i) => [470, y0 + w * (0.22 + i * 0.28), z0 + h / 2]), { size: 1.4, tone: "mid" });
+        else if (h >= 14) out += L(k.segment([470, y0, z0 + h / 2], [470, y1, z0 + h / 2], P), { tone: "mid" }) + (h > 15 && w > 13 ? dots([0, 1, 2, 3, 4, 5].map((i) => [470, y0 + 3 + i * ((w - 6) / 5), z0 + 3.2]), { size: 0.4, tone: "mid" }) : "");
+        else out += L(k.segment([470, y0, z0 + h / 2], [470, y1, z0 + h / 2], P), { tone: "mid" });
       }
       for (let y = 74; y < 228; y += 7) out += L(k.segment([470, y, 6], [470, y, 11], P), { tone: "faint" });
       out += dots([[470, 76, 44], [470, 222, 44], [470, 76, 8], [470, 222, 8]], { size: 0.6 });

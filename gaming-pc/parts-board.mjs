@@ -39,6 +39,11 @@ export function buildBoard(W) {
       // PCIe lanes toward the x16 slot, VRM power plane lines
       for (let i = 0; i < 5; i++) out += L(k.onTop([[358, 164 + i * 3.4], [358, 174 + i * 3.4], [372 + i * 3, 188 + i * 3.4], [372 + i * 3, 240]], zt, P), { tone: "faint", free: true });
       for (let i = 0; i < 4; i++) out += L(k.onTop([[383, 114 + i * 5], [398, 114 + i * 5], [398, 88]], zt, P), { tone: "faint", free: true });
+      for (let i = 0; i < 8; i++) out += L(k.onTop([[300, 226 + i * 3], [330, 226 + i * 3], [338, 218 + i * 3], [362, 218 + i * 3]], zt, P), { tone: "faint", free: true });
+      for (let i = 0; i < 6; i++) out += L(k.onTop([[236, 190 + i * 3.4], [262, 190 + i * 3.4], [270, 214 + i * 3.4], [356, 214 + i * 3.4]], zt, P), { tone: "faint", free: true });
+      const vias = [];
+      for (let x = 240; x < 440; x += 14) for (let y = 250; y < 350; y += 14) if (!((x > 255 && x < 310 && y > 305) || (x > 340 && y > 290 && y < 340))) vias.push([x + ((y / 14) % 2) * 5, y, zt]);
+      out += dots(vias, { size: 0.35, tone: "lo" });
       out += W.textZ(BOARD.x + 8, by1 - 12, zt, "ATX 305 × 244", 5, "lo");
       out += W.textZ(bx1 - 94, by1 - 12, zt, "PCIE 5.0 X16 · DDR5", 5, "lo");
       return out;
