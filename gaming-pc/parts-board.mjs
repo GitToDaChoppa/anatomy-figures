@@ -52,7 +52,7 @@ export function buildBoard(W) {
 
   // CPU socket
   W.box({
-    x: 333, y: 104, w: 50, d: 56, z: Z, h: 4.8, r: 1.6, steps: 3, bevel: 0.3, tone: "lo", sub: [0, 0, 16], name: "socket",
+    x: 333, y: 104, w: 50, d: 56, z: Z, h: 4.8, r: 1.6, steps: 3, bevel: 0.3, tone: "lo", sub: [0, 0, 29], name: "socket",
     deco: (plan, zt) => {
       const pin = { x: 338, y: 109, w: 40, d: 46, r: 1 };
       const pd = k.planOutline(pin, zt, P, 3);
@@ -71,15 +71,15 @@ export function buildBoard(W) {
   });
 
   // VRM heatsinks (the processor's power stage), fins across
-  W.box({ x: 360, y: 64, w: 88, d: 20, z: Z, h: 24, r: 1.5, steps: 3, bevel: 0.6, tone: "hi", sub: [0, 0, 44], name: "vrm top", deco: (p, zt) => fins(360, 64, 88, 20, zt, 24, "y", 4) + screwDots([[364, 68], [444, 80]], zt) });
-  W.box({ x: 414, y: 88, w: 34, d: 118, z: Z, h: 24, r: 1.5, steps: 3, bevel: 0.6, tone: "hi", sub: [0, 0, 44], name: "vrm rear", deco: (p, zt) => fins(414, 88, 34, 118, zt, 24, "x", 4) + screwDots([[418, 92], [444, 202]], zt) });
+  W.box({ x: 360, y: 64, w: 88, d: 20, z: Z, h: 24, r: 1.5, steps: 3, bevel: 0.6, tone: "hi", sub: [0, 0, 79], name: "vrm top", deco: (p, zt) => fins(360, 64, 88, 20, zt, 24, "y", 4) + screwDots([[364, 68], [444, 80]], zt) });
+  W.box({ x: 414, y: 88, w: 34, d: 118, z: Z, h: 24, r: 1.5, steps: 3, bevel: 0.6, tone: "hi", sub: [0, 0, 79], name: "vrm rear", deco: (p, zt) => fins(414, 88, 34, 118, zt, 24, "x", 4) + screwDots([[418, 92], [444, 202]], zt) });
   // chipset heatsink
-  W.box({ x: 262, y: 312, w: 44, d: 40, z: Z, h: 11, r: 2, steps: 3, bevel: 0.5, tone: "hi", sub: [0, 0, 30], name: "chipset", deco: (p, zt) => fins(262, 312, 44, 40, zt, 11, "x", 4) + L(k.planOutline(k.insetPlan(p, 2), zt, P, 3), { tone: "faint" }) + screwDots([[266, 316], [302, 348]], zt) });
+  W.box({ x: 262, y: 312, w: 44, d: 40, z: Z, h: 11, r: 2, steps: 3, bevel: 0.5, tone: "hi", sub: [0, 0, 54], name: "chipset", deco: (p, zt) => fins(262, 312, 44, 40, zt, 11, "x", 4) + L(k.planOutline(k.insetPlan(p, 2), zt, P, 3), { tone: "faint" }) + screwDots([[266, 316], [302, 348]], zt) });
 
   // DIMM slots
   RAM_X.forEach((cx, n) => {
     W.box({
-      x: cx - 3.5, y: RAM_Y[0], w: 7, d: RAM_Y[1] - RAM_Y[0], z: Z, h: 8, r: 0.8, steps: 2, bevel: 0.2, tone: "lo", sub: [0, 0, 10 + n], name: "dimm slot " + (n + 1),
+      x: cx - 3.5, y: RAM_Y[0], w: 7, d: RAM_Y[1] - RAM_Y[0], z: Z, h: 8, r: 0.8, steps: 2, bevel: 0.2, tone: "lo", sub: [0, 0, 18 + n], name: "dimm slot " + (n + 1),
       deco: (p, zt) => {
         const groove = k.planOutline({ x: cx - 1.6, y: RAM_Y[0] + 3, w: 3.2, d: RAM_Y[1] - RAM_Y[0] - 6, r: 1.4 }, zt, P, 3);
         return `<path class="pc-void" d="${groove}"/>` + L(groove, { tone: "faint" }) + L(k.lineOnTop([cx - 1.6, 142], [cx + 1.6, 142], zt, P), { tone: "mid" });
@@ -101,12 +101,12 @@ export function buildBoard(W) {
   pcie(359, 324, 89, 7, "pcie x16 b", [0, 0, 12]);
 
   // M.2 socket and the screw post at the other end of an 80 mm stick
-  W.box({ x: 438, y: 214, w: 9, d: 20, z: Z, h: 2.8, r: 0.8, steps: 2, tone: "lo", sub: [0, 0, 10], name: "m2 socket", deco: (p, zt) => L(k.lineOnTop([440, 216], [440, 232], zt, P), { tone: "mid" }) });
-  W.cyl({ cx: 361, cy: 223, r: 3, z: Z, h: 2.6, steps: 10, tone: "hi", sub: [0, 0, 10], name: "m2 post", deco: (zt) => L(k.ring(361, 223, 1.2, zt, P, 8), { tone: "lo" }) });
+  W.box({ x: 438, y: 214, w: 9, d: 20, z: Z, h: 2.8, r: 0.8, steps: 2, tone: "lo", sub: [0, 0, 18], name: "m2 socket", deco: (p, zt) => L(k.lineOnTop([440, 216], [440, 232], zt, P), { tone: "mid" }) });
+  W.cyl({ cx: 361, cy: 223, r: 3, z: Z, h: 2.6, steps: 10, tone: "hi", sub: [0, 0, 18], name: "m2 post", deco: (zt) => L(k.ring(361, 223, 1.2, zt, P, 8), { tone: "lo" }) });
 
   // 24-pin power socket on the front edge, 8-pin CPU power on the top edge
   W.box({
-    x: 216, y: 120, w: 19, d: 61, z: Z, h: 17, r: 1, steps: 2, bevel: 0.3, tone: "mid", sub: [0, 0, 22], name: "atx24",
+    x: 216, y: 120, w: 19, d: 61, z: Z, h: 17, r: 1, steps: 2, bevel: 0.3, tone: "mid", sub: [0, 0, 40], name: "atx24",
     deco: (p, zt) => {
       const pins = [];
       for (let i = 0; i < 12; i++) for (const dx of [5.5, 13]) pins.push([216 + dx, 123.5 + i * 4.7, zt]);
@@ -114,24 +114,24 @@ export function buildBoard(W) {
     },
   });
   W.box({
-    x: 331, y: 62, w: 21, d: 10, z: Z, h: 14, r: 1, steps: 2, bevel: 0.3, tone: "mid", sub: [0, 0, 22], name: "eps8",
+    x: 331, y: 62, w: 21, d: 10, z: Z, h: 14, r: 1, steps: 2, bevel: 0.3, tone: "mid", sub: [0, 0, 40], name: "eps8",
     deco: (p, zt) => dots([0, 1, 2, 3].flatMap((i) => [[334.5 + i * 4.6, 65.5, zt], [334.5 + i * 4.6, 70, zt]]), { size: 0.9, tone: "lo" }) + L(k.planOutline(k.insetPlan(p, 1.5), zt, P, 2), { tone: "faint" }),
   });
 
   // headers, battery, SATA ports
-  W.box({ x: 312, y: 76, w: 13, d: 5.5, z: Z, h: 8, r: 0.6, steps: 2, tone: "lo", sub: [0, 0, 14], name: "cpu fan header", deco: (p, zt) => dots([[315, 78.7, zt], [318.5, 78.7, zt], [322, 78.7, zt]], { size: 0.6 }) });
-  W.box({ x: 300, y: 352, w: 26, d: 6, z: Z, h: 8, r: 0.6, steps: 2, tone: "lo", sub: [0, 0, 14], name: "front panel header", deco: (p, zt) => dots([0, 1, 2, 3, 4].map((i) => [303 + i * 4.6, 355, zt]), { size: 0.6 }) });
-  W.box({ x: 340, y: 350, w: 22, d: 8, z: Z, h: 10, r: 0.6, steps: 2, tone: "lo", sub: [0, 0, 16], name: "usb header", deco: (p, zt) => dots([0, 1, 2, 3, 4, 5, 6, 7].map((i) => [343 + (i % 4) * 4.6, 352.2 + Math.floor(i / 4) * 3.6, zt]), { size: 0.5 }) });
-  W.box({ x: 236, y: 352, w: 18, d: 6, z: Z, h: 8, r: 0.6, steps: 2, tone: "lo", sub: [0, 0, 14], name: "audio header", deco: (p, zt) => dots([0, 1, 2, 3].map((i) => [240 + i * 4, 355, zt]), { size: 0.5 }) });
+  W.box({ x: 312, y: 76, w: 13, d: 5.5, z: Z, h: 8, r: 0.6, steps: 2, tone: "lo", sub: [0, 0, 25], name: "cpu fan header", deco: (p, zt) => dots([[315, 78.7, zt], [318.5, 78.7, zt], [322, 78.7, zt]], { size: 0.6 }) });
+  W.box({ x: 300, y: 352, w: 26, d: 6, z: Z, h: 8, r: 0.6, steps: 2, tone: "lo", sub: [0, 0, 25], name: "front panel header", deco: (p, zt) => dots([0, 1, 2, 3, 4].map((i) => [303 + i * 4.6, 355, zt]), { size: 0.6 }) });
+  W.box({ x: 340, y: 350, w: 22, d: 8, z: Z, h: 10, r: 0.6, steps: 2, tone: "lo", sub: [0, 0, 29], name: "usb header", deco: (p, zt) => dots([0, 1, 2, 3, 4, 5, 6, 7].map((i) => [343 + (i % 4) * 4.6, 352.2 + Math.floor(i / 4) * 3.6, zt]), { size: 0.5 }) });
+  W.box({ x: 236, y: 352, w: 18, d: 6, z: Z, h: 8, r: 0.6, steps: 2, tone: "lo", sub: [0, 0, 25], name: "audio header", deco: (p, zt) => dots([0, 1, 2, 3].map((i) => [240 + i * 4, 355, zt]), { size: 0.5 }) });
   for (let i = 0; i < 4; i++) {
     W.box({
-      x: 218, y: 318 + i * 9.4, w: 18, d: 8, z: Z, h: 7, r: 0.8, steps: 2, bevel: 0.2, tone: "lo", sub: [0, 0, 18 + i * 2], name: "sata " + (i + 1),
+      x: 218, y: 318 + i * 9.4, w: 18, d: 8, z: Z, h: 7, r: 0.8, steps: 2, bevel: 0.2, tone: "lo", sub: [0, 0, 32 + i * 2], name: "sata " + (i + 1),
       deco: (p, zt) => L(k.onTop([[221, 320.5 + i * 9.4], [231, 320.5 + i * 9.4], [231, 323.8 + i * 9.4], [233, 323.8 + i * 9.4]], zt, P), { tone: "faint" }) + dots([[224, 322 + i * 9.4, zt]], { size: 0.5 }),
     });
   }
-  W.cyl({ cx: 335, cy: 300, r: 10, z: Z, h: 3.4, steps: 24, bevel: 0.4, tone: "hi", sub: [0, 0, 26], name: "battery", deco: (zt) => L(k.ring(335, 300, 6.5, zt, P, 20), { tone: "faint" }) + W.textZ(333, 301.4, zt, "+", 4.4, "mid") });
+  W.cyl({ cx: 335, cy: 300, r: 10, z: Z, h: 3.4, steps: 24, bevel: 0.4, tone: "hi", sub: [0, 0, 47], name: "battery", deco: (zt) => L(k.ring(335, 300, 6.5, zt, P, 20), { tone: "faint" }) + W.textZ(333, 301.4, zt, "+", 4.4, "mid") });
   // filter capacitors beside the socket
-  for (let i = 0; i < 5; i++) W.cyl({ cx: 318, cy: 106 + i * 12, r: 3.2, z: Z, h: 9, steps: 14, tone: "mid", sub: [0, 0, 20 + (i % 2) * 5], name: "capacitor", deco: (zt) => L(k.ring(318, 106 + i * 12, 1.8, zt, P, 10), { tone: "faint" }) });
+  for (let i = 0; i < 5; i++) W.cyl({ cx: 318, cy: 106 + i * 12, r: 3.2, z: Z, h: 9, steps: 14, tone: "mid", sub: [0, 0, 36 + (i % 2) * 5], name: "capacitor", deco: (zt) => L(k.ring(318, 106 + i * 12, 1.8, zt, P, 10), { tone: "faint" }) });
 
   // rear I/O: the connectors that poke through the shield
   const ports = [
@@ -141,7 +141,7 @@ export function buildBoard(W) {
   ];
   for (const [n, p] of ports.entries()) {
     W.box({
-      x: 446, y: p.y, w: 22, d: p.w, z: Z, h: p.h, r: 0.8, steps: 2, bevel: 0.2, tone: "mid", sub: [0, 0, 26 + n * 2], name: p.n,
+      x: 446, y: p.y, w: 22, d: p.w, z: Z, h: p.h, r: 0.8, steps: 2, bevel: 0.2, tone: "mid", sub: [0, 0, 48 + n * 3], name: p.n,
       deco: () => {
         const X = 468;
         let out = L(faceX(X, [p.y + 1.6, p.y + p.w - 1.6], [Z + 1.6, Z + p.h - 1.6], 0.8), { tone: "faint" });
