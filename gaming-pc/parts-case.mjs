@@ -103,8 +103,52 @@ export function buildCase(W) {
   // ---- the power supply ---------------------------------------------------------------------------------------
   W.use("psu");
   const fanC = [PSU.x + PSU.w / 2, PSU.y + PSU.d, PSU.h / 2];
+  // The supply is built in layers so it can open: a base with the board, the parts that stand on it, and the cover.
+  const SEAM = 54; // top of the base; everything inside stands on the board here
+  const sx0 = PSU.x, sx1 = PSU.x + PSU.w, sy0 = PSU.y, sy1 = PSU.y + PSU.d;
   W.box({
-    x: PSU.x, y: PSU.y, w: PSU.w, d: PSU.d, z: 0, h: PSU.h, r: 4, steps: 4, bevel: 0.9, tone: "hi", name: "psu body",
+    x: sx0, y: sy0, w: PSU.w, d: PSU.d, z: 0, h: SEAM, r: 4, steps: 4, bevel: 0.9, tone: "hi", name: "psu base",
+    deco: (plan, zt) => {
+      let out = L(k.planOutline(k.insetPlan(plan, 5), zt, P, 4), { tone: "faint" });
+      // the main board, with its mounting holes
+      const pcb = k.insetPlan(plan, 7);
+      out += S(k.slabOf(pcb, zt - 1.4, 1.4, P, 3), { tone: "lo", crease: "none" });
+      out += dots(k.corners(k.insetPlan(plan, 11), 3).map(([x, y]) => [x, y, zt]), { size: 0.9, tone: "hi" });
+      // the rear face: outline and vents
+      out += L(faceX(sx1, [sy0 + 5, sy1 - 5], [5, SEAM - 5], 3), { tone: "faint" });
+      const vx = [];
+      for (let j = 0; j < 6; j++) for (let i = 0; i < 6; i++) vx.push([sx1, sy0 + 12 + i * 4.2, 14 + j * 5.2]);
+      return out + dots(vx, { size: 0.45, tone: "mid" });
+    },
+  });
+  // what stands on the board: connector panel, heat sinks, transformer, choke and capacitors
+  const finsX = (x, y, w, d, zt, n) => { let s = ""; for (let i = 1; i < n; i++) s += L(k.lineOnTop([x, y + (i * d) / n], [x + w, y + (i * d) / n], zt, P), { tone: "lo" }); return s; };
+  for (let i = 0; i < 4; i++) {
+    W.box({
+      x: sx0 + 4, y: sy0 + 6 + i * 17, w: 10, d: 14, z: SEAM, h: 24, r: 1.2, steps: 3, bevel: 0.3, tone: "lo", sub: [0, 0, 12], name: "modular socket",
+      deco: (p, zt) => dots([0, 1, 2, 3, 4, 5].map((n) => [sx0 + 6 + (n % 3) * 3, sy0 + 10 + i * 17 + Math.floor(n / 3) * 6, zt]), { size: 0.7, tone: "hi" }),
+    });
+  }
+  W.box({ x: sx0 + 14, y: sy0 + 6, w: 3, d: 66, z: SEAM, h: 36, r: 1, steps: 2, bevel: 0.2, tone: "mid", sub: [0, 0, 12], name: "connector board" });
+  W.box({ x: sx0 + 22, y: sy0 + 8, w: 20, d: 62, z: SEAM, h: 42, r: 1.5, steps: 3, bevel: 0.5, tone: "hi", sub: [0, 0, 22], name: "heat sink a", deco: (p, zt) => finsX(sx0 + 22, sy0 + 8, 20, 62, zt, 10) });
+  W.box({ x: sx0 + 48, y: sy0 + 8, w: 16, d: 62, z: SEAM, h: 30, r: 1.5, steps: 3, bevel: 0.5, tone: "hi", sub: [0, 0, 22], name: "heat sink b", deco: (p, zt) => finsX(sx0 + 48, sy0 + 8, 16, 62, zt, 8) });
+  W.box({
+    x: sx0 + 72, y: sy0 + 46, w: 36, d: 26, z: SEAM, h: 32, r: 2, steps: 3, bevel: 0.5, tone: "mid", sub: [0, 0, 30], name: "transformer",
+    deco: (p, zt) => finsX(sx0 + 72, sy0 + 46, 36, 26, zt, 6) + L(k.planOutline(k.insetPlan(p, 4), zt, P, 2), { tone: "faint" }),
+  });
+  W.cyl({
+    cx: sx0 + 90, cy: sy0 + 28, r: 12, z: SEAM, h: 16, bevel: 0.5, tone: "lo", sub: [0, 0, 30], name: "choke",
+    deco: (zt) => dots([0, 1, 2, 3, 4, 5].map((n) => [sx0 + 90 + Math.cos((n * Math.PI) / 3) * 7, sy0 + 28 + Math.sin((n * Math.PI) / 3) * 7, zt]), { size: 0.9, tone: "hi" }),
+  });
+  for (let i = 0; i < 4; i++) W.cyl({ cx: sx0 + 72 + i * 11, cy: sy0 + 8, r: 4.5, z: SEAM, h: 14, bevel: 0.3, tone: "mid", sub: [0, 0, 36], name: "capacitor", deco: (zt) => dots([[sx0 + 72 + i * 11, sy0 + 8, zt]], { size: 1, tone: "lo" }) });
+  for (const cy of [sy0 + 24, sy0 + 61]) {
+    W.cyl({
+      cx: sx0 + 136, cy, r: cy < sy0 + 40 ? 17 : 14, z: SEAM, h: 46, bevel: 0.6, tone: "hi", sub: [0, 0, 44], name: "bulk capacitor",
+      deco: (zt) => L(k.lineOnTop([sx0 + 136 - 7, cy], [sx0 + 136 + 7, cy], zt, P), { tone: "lo", free: true }) + L(k.lineOnTop([sx0 + 136, cy - 7], [sx0 + 136, cy + 7], zt, P), { tone: "lo", free: true }),
+    });
+  }
+  W.box({
+    x: sx0, y: sy0, w: PSU.w, d: PSU.d, z: SEAM + 1, h: PSU.h - SEAM - 1, r: 4, steps: 4, bevel: 0.9, tone: "hi", sub: [0, 0, 125], name: "psu cover",
     deco: (plan, zt) => {
       let out = L(k.planOutline(k.insetPlan(plan, 5), zt, P, 4), { tone: "faint" });
       // the rating label on the side panel
@@ -120,24 +164,20 @@ export function buildCase(W) {
       for (let i = 0; i < 6; i++) vents.push(k.planOutline({ x: PSU.x + 12 + i * 6.4, y: PSU.y + 12, w: 3, d: 54, r: 1.5 }, zt, P, 3));
       out += vents.map((d) => `<path class="pc-void" d="${d}"/>` + L(d, { tone: "lo" })).join("");
       out += dots(k.corners(plan, 8).map(([x, y]) => [x, y, zt]), { size: 0.6 });
-      // the rear face: AC inlet, switch, vents (the flat of the near +x face)
-      out += L(faceX(PSU.x + PSU.w, [PSU.y + 5, PSU.y + PSU.d - 5], [5, PSU.h - 5], 3), { tone: "faint" });
-      const vx = [];
-      for (let j = 0; j < 6; j++) for (let i = 0; i < 6; i++) vx.push([PSU.x + PSU.w, PSU.y + 12 + i * 4.2, 14 + j * 5.2]);
-      out += dots(vx, { size: 0.45, tone: "mid" });
-      return out;
+      // the rear face above the seam
+      return out + L(faceX(sx1, [sy0 + 5, sy1 - 5], [SEAM + 5, PSU.h - 5], 3), { tone: "faint" });
     },
   });
   // the AC inlet and rocker switch plug into the rear face
   W.box({
-    x: PSU.x + PSU.w, y: PSU.y + 8, w: 3, d: 34, z: 98, h: 26, r: 2, steps: 3, bevel: 0.3, tone: "mid", sub: [34, 0, 0], name: "ac inlet",
+    x: PSU.x + PSU.w, y: PSU.y + 8, w: 3, d: 34, z: 98, h: 26, r: 2, steps: 3, bevel: 0.3, tone: "mid", sub: [34, 0, 125], name: "ac inlet",
     deco: () => {
       const X = PSU.x + PSU.w + 3;
       return L(faceX(X, [PSU.y + 12, PSU.y + 38], [102, 120], 2), { tone: "lo" }) + dots([[X, PSU.y + 18, 111], [X, PSU.y + 25, 111], [X, PSU.y + 32, 111]], { size: 1.1, tone: "hi" });
     },
   });
   W.box({
-    x: PSU.x + PSU.w, y: PSU.y + 50, w: 3, d: 20, z: 98, h: 26, r: 2, steps: 3, bevel: 0.3, tone: "mid", sub: [34, 0, 0], name: "switch",
+    x: PSU.x + PSU.w, y: PSU.y + 50, w: 3, d: 20, z: 98, h: 26, r: 2, steps: 3, bevel: 0.3, tone: "mid", sub: [34, 0, 125], name: "switch",
     deco: () => L(faceX(PSU.x + PSU.w + 3, [PSU.y + 54, PSU.y + 66], [104, 118], 2), { tone: "lo" }) + L(k.segment([PSU.x + PSU.w + 3, PSU.y + 60, 108], [PSU.x + PSU.w + 3, PSU.y + 60, 114], P), { tone: "hi", free: true }),
   });
   // the 135 mm fan under the basement grille
